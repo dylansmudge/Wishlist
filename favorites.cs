@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using System.IO;
 using Azure.Data.Tables;
 using Azure;
-using System.Web;
 
 namespace TableStorage
 {
@@ -38,7 +37,7 @@ namespace TableStorage
         {
             try
             {
-                Pageable<TableEntity> queryResultsFilter = _favoriteTableClient.Query<TableEntity>();
+                Pageable<FavoriteItems> queryResultsFilter = _favoriteTableClient.Query<FavoriteItems>();
 
                 Console.WriteLine($"The query returned {queryResultsFilter.Count()} entities.");
                 
@@ -52,8 +51,8 @@ namespace TableStorage
             }
         }
 
-        [FunctionName("GetFavorites1")]
-        public async Task<IActionResult> RunGetFavorites1(
+        [FunctionName("GetUserFavorites")]
+        public async Task<IActionResult> GetUserFavorites(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -61,7 +60,7 @@ namespace TableStorage
             {
                 string query = req.Query["UserId"];
 
-                Pageable<TableEntity> queryResultsFilter = _favoriteTableClient.Query<TableEntity>(filter: $"UserId eq {query}");
+                Pageable<FavoriteItems> queryResultsFilter = _favoriteTableClient.Query<FavoriteItems>(filter: $"UserId eq {query}");
 
                 Console.WriteLine($"The query returned {queryResultsFilter.Count()} entities.");
                 
@@ -86,7 +85,7 @@ namespace TableStorage
 
                 Console.WriteLine($"ItemId {itemId}");
 
-                Pageable<TableEntity> queryResultsFilter = _favoriteTableClient.Query<TableEntity>(filter: $"ItemId eq {itemId}");
+                Pageable<FavoriteItems> queryResultsFilter = _favoriteTableClient.Query<FavoriteItems>(filter: $"ItemId eq {itemId}");
 
                 Console.WriteLine($"The query returned {queryResultsFilter.Count()} entities.");
                 return new OkObjectResult(queryResultsFilter);
@@ -110,10 +109,13 @@ namespace TableStorage
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 log.LogInformation("Request body is {requestBody}", requestBody);
                 FavoriteItems favorites = JsonConvert.DeserializeObject<FavoriteItems>(requestBody);
+                Guid obj = Guid.NewGuid();    
+                Console.WriteLine("New Guid is " + obj.ToString());  
 
                 await _favoriteTableClient.AddEntityAsync(favorites);
 
                 return new OkObjectResult(favorites);
+
 
             }
             catch (Exception e)
@@ -133,10 +135,6 @@ namespace TableStorage
                 string PartitionKey = req.Query["PartitionKey"];
                 string RowKey = req.Query["RowKey"];
                 Console.WriteLine($"query params string is PartitionKey {PartitionKey} RowKey {RowKey}");
-
-                Pageable<TableEntity> favoriteFilter = _favoriteTableClient.Query<TableEntity>(filter: $"PartitionKey eq '{PartitionKey}' and RowKey eq '{RowKey}'");
-
-                Pageable<TableEntity> queryResultsFilter = _favoriteTableClient.Query<TableEntity>();
 
                 await _favoriteTableClient.DeleteEntityAsync(PartitionKey, RowKey);
 

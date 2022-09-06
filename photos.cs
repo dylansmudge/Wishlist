@@ -1,20 +1,14 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System.IO;
-using Azure.Data.Tables;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage;
-using System.Drawing;
-using System.Reflection;
-using SkiaSharp;
 using System.Collections.Generic;
 
 namespace TableStorage
@@ -63,7 +57,7 @@ namespace TableStorage
                     downloadFileStream.Close();
                 }*/
                 BlobClient blob = _photoBlobContainerClient.GetBlobClient(name);
-                return new OkObjectResult(blob.Uri); 
+                return new OkObjectResult(blob); 
 
             }
             catch (Exception e)
@@ -107,14 +101,8 @@ namespace TableStorage
         {
             try 
             {
-
-            
-            string localFilePath = "/Users/dylancarlyle/Documents/Test/DataFiles/Photos/teaspoon.png";
-
-            string fileName = Path.GetFileName(localFilePath);
-            BlobClient blobClient = _photoBlobContainerClient.GetBlobClient(fileName);
-
-
+            string content = req.ContentType;
+            Console.WriteLine($"Content type {content}");
 
 
             BinaryReader reader = new BinaryReader(req.Body);
@@ -127,25 +115,26 @@ namespace TableStorage
 
             Stream image = binaryData.ToStream();
 
-            var blobHttpHeader = new BlobHttpHeaders();
-            string extension = Path.GetExtension(blobClient.Uri.AbsoluteUri);
+            BlobHttpHeaders blobHttpHeader = new BlobHttpHeaders();
+            string extension = blobHttpHeader.ContentType;
+            Console.WriteLine($"Extension {extension}");
             switch (extension.ToLower())
             {
-                case ".jpg":
-                case ".jpeg":
+                case "image/jpg":
+                case "image/jpeg":
                     blobHttpHeader.ContentType = "image/jpeg";
                     break;
-                case ".png":
+                case "image/png":
                     blobHttpHeader.ContentType = "image/png";
                     break;
-                case ".gif":
+                case "image/gif":
                     blobHttpHeader.ContentType = "image/gif";
                     break;
                 default:
                     break;
             }
-
-            await blobClient.UploadAsync(image, blobHttpHeader);
+            
+            BlobContentInfo blobContentInfo = await _photoBlobClient.UploadAsync(image, blobHttpHeader);
 
             return new OkObjectResult(image);
 

@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using System.IO;
 using Azure.Data.Tables;
 using Azure;
-using System.Web;
 
 namespace TableStorage
 {

@@ -60,16 +60,16 @@ namespace TableStorage
                 partitionKey : $"{itemId}",
                 rowKey : $"{itemId}");
 
-                int itemsCount = itemsQuery.Quantity;
-                Console.WriteLine($"Quantity is {itemsCount}");
+                int itemQuantity = itemsQuery.Quantity;
+                Console.WriteLine($"Quantity is {itemQuantity}");
                 
 
-                if (itemsCount < favoritesCount)
+                if (itemQuantity < favoritesCount)
                 {
                     return new OkObjectResult($"Low stock");
                 }
                 else
-                    return new OkObjectResult($"There are {itemsCount - favoritesCount} more items yet to be wishlisted");
+                    return new OkObjectResult($"There are {itemQuantity - favoritesCount} more items yet to be wishlisted");
             }
             catch (Exception e)
             {

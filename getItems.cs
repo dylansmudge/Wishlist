@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using System.IO;
 using Azure.Data.Tables;
 using Azure;
-using System.Web;
 
 namespace TableStorage
 {
@@ -43,18 +42,7 @@ namespace TableStorage
 
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 log.LogInformation("Request body is {requestBody}", requestBody);
-                /*
-                expect this (within postman):
-                {
-                    "PartitionKey": "3",
-                    "RowKey": "3",
-                    "Name": "HB Pencil",
-                    "Description": "It's a pencil",
-                    "Price": 2,
-                    "Quantity": 31,
-                    "isFavorite": false
-                }
-                */
+
 
                 WarehouseItems warehouseItems = JsonConvert.DeserializeObject<WarehouseItems>(requestBody);
 
@@ -78,7 +66,7 @@ namespace TableStorage
         {
             try
             {
-                Pageable<TableEntity> queryResultsFilter = _itemTableClient.Query<TableEntity>();
+                Pageable<WarehouseItems> queryResultsFilter = _itemTableClient.Query<WarehouseItems>();
 
                 Console.WriteLine($"The query returned {queryResultsFilter.Count()} entities.");
                 
@@ -92,16 +80,16 @@ namespace TableStorage
             }
         }
 
-                [FunctionName("GetItem1")]
-        public async Task<IActionResult> RunGetItem1(
+                [FunctionName("GetItemsByPartitionKey")]
+        public async Task<IActionResult> GetItemsByPartitionKey(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
             try
             {
                 string partitionKey = req.Query["PartitionKey"];
-                Pageable<TableEntity> queryResultsFilter = _itemTableClient.Query<TableEntity>(filter: $"PartitionKey eq {partitionKey}");
-                return new OkObjectResult(queryResultsFilter);
+                Pageable<WarehouseItems> getItemsByPartitionKey = _itemTableClient.Query<WarehouseItems>(filter: $"PartitionKey eq {partitionKey}");
+                return new OkObjectResult(getItemsByPartitionKey);
             }
             catch (Exception e)
             {
