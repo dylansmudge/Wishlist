@@ -4,4 +4,3 @@ DataFiles/
 .vscode/
 __blobstorage__/
 __queuestorage__/
-*.json
