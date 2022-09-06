@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/dylancarlyle/Documents/Test/MyFunctionProj.csproj": {}
+    "/Users/dylancarlyle/Documents/Wishlist/MyFunctionProj.csproj": {}
   },
   "projects": {
-    "/Users/dylancarlyle/Documents/Test/MyFunctionProj.csproj": {
+    "/Users/dylancarlyle/Documents/Wishlist/MyFunctionProj.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/dylancarlyle/Documents/Test/MyFunctionProj.csproj",
+        "projectUniqueName": "/Users/dylancarlyle/Documents/Wishlist/MyFunctionProj.csproj",
         "projectName": "MyFunctionProj",
-        "projectPath": "/Users/dylancarlyle/Documents/Test/MyFunctionProj.csproj",
+        "projectPath": "/Users/dylancarlyle/Documents/Wishlist/MyFunctionProj.csproj",
         "packagesPath": "/Users/dylancarlyle/.nuget/packages/",
-        "outputPath": "/Users/dylancarlyle/Documents/Test/obj/",
+        "outputPath": "/Users/dylancarlyle/Documents/Wishlist/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/dylancarlyle/.nuget/NuGet/NuGet.Config"

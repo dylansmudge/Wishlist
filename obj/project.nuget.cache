@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "RPI+Ra+Z6FWj+jry2GfpTLAxld3jxZghkGUKhZ+oh7c7VrNBGS2641AnSdlOPIRLo27VvQAlgvd1GRcLFtRAUQ==",
+  "dgSpecHash": "GM+rEU4ff+Z85261J10ftjYC7uUgVlPfi5pe/L9fsjvPPY+JzV0VWkuEemqnECjWa2l/1ll9QeO4iRwup3P9jA==",
   "success": true,
-  "projectFilePath": "/Users/dylancarlyle/Documents/Test/MyFunctionProj.csproj",
+  "projectFilePath": "/Users/dylancarlyle/Documents/Wishlist/MyFunctionProj.csproj",
   "expectedPackageFiles": [
     "/Users/dylancarlyle/.nuget/packages/azure.core/1.25.0/azure.core.1.25.0.nupkg.sha512",
     "/Users/dylancarlyle/.nuget/packages/azure.data.tables/12.6.1/azure.data.tables.12.6.1.nupkg.sha512",

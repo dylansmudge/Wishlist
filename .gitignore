@@ -1,0 +1,5 @@
+obj/
+bin/
+__blobstorage__/
+__queuestorage__/
+*.json
