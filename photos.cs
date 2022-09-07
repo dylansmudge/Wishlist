@@ -19,9 +19,7 @@ namespace TableStorage
         string AccountName = Environment.GetEnvironmentVariable("AccountName");
         string Uri = Environment.GetEnvironmentVariable("BlobUri");
         string AccountKey = Environment.GetEnvironmentVariable("AccountKey");
-
         private readonly BlobContainerClient _photoBlobContainerClient;
-
         private readonly BlobClient _photoBlobClient;
         public Photos() 
         {
