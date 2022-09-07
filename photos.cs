@@ -44,7 +44,7 @@ namespace TableStorage
             string name = req.Query["Name"];
 
             Console.WriteLine($"Name {name}");
-            
+
             try 
             {
                 BlobClient blob = _photoBlobContainerClient.GetBlobClient(name);
