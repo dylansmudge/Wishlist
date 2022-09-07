@@ -23,9 +23,6 @@ namespace TableStorage
         string Uri = Environment.GetEnvironmentVariable("Uri");
         string AccountKey = Environment.GetEnvironmentVariable("AccountKey");
         private readonly TableClient _itemTableClient;
-
-        public WishListOptions Configuration {get; set;}
-
         public Items(IOptions<WishListOptions> options) 
         {
             string wishlistOptions = options.Value.TableItem;

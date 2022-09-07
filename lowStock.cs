@@ -6,11 +6,9 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System.IO;
 using Azure.Data.Tables;
 using Azure;
-using System.Web;
+using Microsoft.Extensions.Options;
 
 namespace TableStorage
 {
@@ -20,23 +18,25 @@ namespace TableStorage
     {
         string AccountName = Environment.GetEnvironmentVariable("AccountName");
         string TableFavorite = Environment.GetEnvironmentVariable("TableFavorites");
-
         string TableItem = Environment.GetEnvironmentVariable("TableItem");
         string Uri = Environment.GetEnvironmentVariable("Uri");
         string AccountKey = Environment.GetEnvironmentVariable("AccountKey");
         private readonly TableClient _favoriteTableClient;
         private readonly TableClient _itemTableClient;
 
-        public LowStock() 
+        public LowStock(IOptions<WishListOptions> options) 
         {
+            string favoriteOptions = options.Value.TableFavorites;
+
             this._favoriteTableClient = 
             new TableClient(new Uri(Uri), 
-                TableFavorite, 
+                favoriteOptions, 
                 new TableSharedKeyCredential(AccountName, AccountKey));
 
+            string itemsOptions = options.Value.TableItem;
             this._itemTableClient = 
             new TableClient(new Uri(Uri), 
-                TableItem, 
+                itemsOptions, 
                 new TableSharedKeyCredential(AccountName, AccountKey));
         }
 
