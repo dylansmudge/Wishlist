@@ -10,63 +10,37 @@ using Newtonsoft.Json;
 using System.IO;
 using Azure.Data.Tables;
 using Azure;
+using Microsoft.Extensions.Options;
 
 namespace TableStorage
 {
 
 
-    public class HelloAzuriteTableStorage
+    public class UserRequests
     {
 
         string AccountName = Environment.GetEnvironmentVariable("AccountName");
-        string TableItem = Environment.GetEnvironmentVariable("TableItem");
         string Uri = Environment.GetEnvironmentVariable("Uri");
         string AccountKey = Environment.GetEnvironmentVariable("AccountKey");
-
-        private readonly TableClient _itemTableClient;
-        public HelloAzuriteTableStorage() 
+        private readonly TableClient _userTableClient;
+        public UserRequests(IOptions<WishListOptions> options) 
         {
-            this._itemTableClient = 
+            string wishlistOptions = options.Value.TableUser;
+            this._userTableClient = 
             new TableClient(new Uri(Uri), 
-                TableItem, 
+                wishlistOptions, 
                 new TableSharedKeyCredential(AccountName, AccountKey));
         }
-
-        [FunctionName("PostItem")]
-        public async Task<IActionResult> RunPostItem(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
-        {
-            try
-            {
-
-                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                log.LogInformation("Request body is {requestBody}", requestBody);
-
-
-                WarehouseItems warehouseItems = JsonConvert.DeserializeObject<WarehouseItems>(requestBody);
-
-                await _itemTableClient.AddEntityAsync(warehouseItems);
-
-                return new OkObjectResult(requestBody);
-
-            }
-            catch (Exception e)
-            {
-                log.LogError(e, "Error with creating item. Check that it does not exist already.");
-            }
-
-            return new BadRequestObjectResult("There was an issue");
-        }
     
-        [FunctionName("GetItems")]
-        public async Task<IActionResult> RunGetItems(
+        [FunctionName("GetUsers")]
+        public async Task<IActionResult> RunGetUsers(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
             try
             {
-                Pageable<WarehouseItems> queryResultsFilter = _itemTableClient.Query<WarehouseItems>();
+
+                Pageable<TableEntity> queryResultsFilter = _userTableClient.Query<TableEntity>();
 
                 Console.WriteLine($"The query returned {queryResultsFilter.Count()} entities.");
                 
@@ -80,16 +54,22 @@ namespace TableStorage
             }
         }
 
-                [FunctionName("GetItemsByPartitionKey")]
-        public async Task<IActionResult> GetItemsByPartitionKey(
+        [FunctionName("GetSingleUser")]
+        public async Task<IActionResult> RunGetSingleUser(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
             try
             {
-                string partitionKey = req.Query["PartitionKey"];
-                Pageable<WarehouseItems> getItemsByPartitionKey = _itemTableClient.Query<WarehouseItems>(filter: $"PartitionKey eq {partitionKey}");
-                return new OkObjectResult(getItemsByPartitionKey);
+                string query = req.Query["PartitionKey"];
+                Console.WriteLine($"query params string is {query}");
+
+                Pageable<TableEntity> queryResultsFilter = _userTableClient.Query<TableEntity>(filter: $"PartitionKey eq '{query}'");
+
+                Console.WriteLine($"The query returned {queryResultsFilter.Count()} entities.");
+                
+                return new OkObjectResult(queryResultsFilter);
+
             }
             catch (Exception e)
             {
@@ -98,8 +78,8 @@ namespace TableStorage
             }
         }
 
-        [FunctionName("PostItems")]
-        public async Task<IActionResult> RunPostItems(
+        [FunctionName("PostUser")]
+        public async Task<IActionResult> RunPostUser(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -108,9 +88,13 @@ namespace TableStorage
 
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 log.LogInformation("Request body is {requestBody}", requestBody);
-                WarehouseItems warehouseItems = JsonConvert.DeserializeObject<WarehouseItems>(requestBody);
+                Users users = JsonConvert.DeserializeObject<Users>(requestBody);
+                Guid obj = Guid.NewGuid();    
+                Console.WriteLine("New Guid is " + obj.ToString());
+                users.RowKey = obj.ToString();
+                users.PartitionKey = obj.ToString();
 
-                await _itemTableClient.AddEntityAsync(warehouseItems);
+                await _userTableClient.AddEntityAsync(users);
 
                 return new OkObjectResult(requestBody);
 

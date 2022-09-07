@@ -17,7 +17,6 @@ namespace TableStorage
     {
 
         string AccountName = Environment.GetEnvironmentVariable("AccountName");
-        string BlobImage = Environment.GetEnvironmentVariable("BlobImage");
         string Uri = Environment.GetEnvironmentVariable("BlobUri");
         string AccountKey = Environment.GetEnvironmentVariable("AccountKey");
 
@@ -45,17 +44,9 @@ namespace TableStorage
             string name = req.Query["Name"];
 
             Console.WriteLine($"Name {name}");
-
-
+            
             try 
             {
-                //string downloadpath = "/Users/dylancarlyle/Documents/Test/DataFiles/Photos/" + name;
-                /*BlobDownloadInfo blobdata = await blob.DownloadAsync();
-                using(FileStream downloadFileStream = File.OpenWrite(downloadpath)) 
-                {  
-                    await blobdata.Content.CopyToAsync(downloadFileStream);
-                    downloadFileStream.Close();
-                }*/
                 BlobClient blob = _photoBlobContainerClient.GetBlobClient(name);
                 return new OkObjectResult(blob); 
 
@@ -83,6 +74,7 @@ namespace TableStorage
                 imageNamesList.Add($"{blobItem.Name}");
             }
             return new OkObjectResult(imageNamesList);
+
             }
             catch (Exception e)
             {
@@ -101,9 +93,10 @@ namespace TableStorage
         {
             try 
             {
-            string content = req.ContentType;
-            Console.WriteLine($"Content type {content}");
+            string localFilePath = "/Users/dylancarlyle/Documents/Test/DataFiles/Photos/teaspoon.png";
 
+            string fileName = Path.GetFileName(localFilePath);
+            BlobClient blobClient = _photoBlobContainerClient.GetBlobClient(fileName);
 
             BinaryReader reader = new BinaryReader(req.Body);
 
@@ -116,25 +109,25 @@ namespace TableStorage
             Stream image = binaryData.ToStream();
 
             BlobHttpHeaders blobHttpHeader = new BlobHttpHeaders();
-            string extension = blobHttpHeader.ContentType;
+            string extension = Path.GetExtension(blobClient.Uri.AbsoluteUri);
             Console.WriteLine($"Extension {extension}");
             switch (extension.ToLower())
             {
-                case "image/jpg":
-                case "image/jpeg":
+                case ".jpg":
+                case ".jpeg":
                     blobHttpHeader.ContentType = "image/jpeg";
                     break;
-                case "image/png":
+                case ".png":
                     blobHttpHeader.ContentType = "image/png";
                     break;
-                case "image/gif":
+                case ".gif":
                     blobHttpHeader.ContentType = "image/gif";
                     break;
                 default:
                     break;
             }
             
-            BlobContentInfo blobContentInfo = await _photoBlobClient.UploadAsync(image, blobHttpHeader);
+             await blobClient.UploadAsync(image, blobHttpHeader);
 
             return new OkObjectResult(image);
 

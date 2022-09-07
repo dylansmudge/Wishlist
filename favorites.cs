@@ -10,23 +10,24 @@ using Newtonsoft.Json;
 using System.IO;
 using Azure.Data.Tables;
 using Azure;
+using Microsoft.Extensions.Options;
 
 namespace TableStorage
 {
     public class Favorites
     {
-
         string AccountName = Environment.GetEnvironmentVariable("AccountName");
-        string TableFavorite = Environment.GetEnvironmentVariable("TableFavorites");
         string Uri = Environment.GetEnvironmentVariable("Uri");
         string AccountKey = Environment.GetEnvironmentVariable("AccountKey");
         private readonly TableClient _favoriteTableClient;
 
-        public Favorites() 
+        public Favorites(IOptions<WishListOptions> options) 
         {
+            string wishlistOptions = options.Value.TableFavorites;
+
             this._favoriteTableClient = 
             new TableClient(new Uri(Uri), 
-                TableFavorite, 
+                wishlistOptions, 
                 new TableSharedKeyCredential(AccountName, AccountKey));
         }
 
@@ -110,7 +111,9 @@ namespace TableStorage
                 log.LogInformation("Request body is {requestBody}", requestBody);
                 FavoriteItems favorites = JsonConvert.DeserializeObject<FavoriteItems>(requestBody);
                 Guid obj = Guid.NewGuid();    
-                Console.WriteLine("New Guid is " + obj.ToString());  
+                Console.WriteLine("New Guid is " + obj.ToString());
+                favorites.RowKey = obj.ToString(); 
+                favorites.PartitionKey = obj.ToString(); 
 
                 await _favoriteTableClient.AddEntityAsync(favorites);
 

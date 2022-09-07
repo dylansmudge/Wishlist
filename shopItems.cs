@@ -36,5 +36,14 @@ namespace TableStorage
 
     }
 
+    public class WishListOptions 
+    {
+        public string TableItem {get; set;} = "items";
+        public string TableUser {get; set;} = "users";
+        public string TableFavorites {get; set;} = "favorites";
+        public string BlobImage {get; set;} = "images";
+
+    }
+
         
 }
